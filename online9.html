@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>آزمون آنلاین سنجش آغازین — پایه نهم</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Vazirmatn", "B Nazanin", "B Mitra", Tahoma, sans-serif;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    min-height: 100vh; color: #2c3e50; padding: 20px; direction: rtl; }
+  .container { max-width: 900px; margin: 0 auto; }
+  .card { background: #fff; border-radius: 16px; padding: 24px;
+    box-shadow: 0 10px 40px rgba(0,0,0,.2); margin-bottom: 20px; }
+  .header { text-align: center; margin-bottom: 20px; }
+  .header .basmala { font-size: 13px; color: #555; margin-bottom: 2px; }
+  .header h1 { font-size: 22px; color: #1e3c72; margin: 4px 0; }
+  .header h2 { font-size: 15px; color: #2a5298; margin: 2px 0; font-weight: normal; }
+  .header .meta { font-size: 12px; color: #777; margin-top: 6px; }
+  .frac { display: inline-flex; flex-direction: column; vertical-align: middle;
+    text-align: center; font-size: 0.85em; line-height: 1.1; margin: 0 3px;
+    font-family: "Cambria Math", "Times New Roman", serif;
+    position: relative; top: -0.15em; }
+  .frac > .num { border-bottom: 1.3px solid currentColor; padding: 0 4px 1px; display: block; }
+  .frac > .den { padding: 1px 4px 0; display: block; }
+  .formula { direction: ltr; unicode-bidi: isolate; display: inline-block;
+    font-family: "Cambria Math", "Times New Roman", serif; margin: 0 2px; }
+  .center-formula { text-align: center; margin: 6px 0; font-size: 15px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-weight: bold; margin-bottom: 6px; color: #1e3c72; }
+  .form-group input, .form-group select { width: 100%; padding: 12px; border: 2px solid #e0e0e0;
+    border-radius: 8px; font-family: inherit; font-size: 15px; transition: border-color .2s; }
+  .form-group input:focus, .form-group select:focus { outline: none; border-color: #2a5298; }
+  .btn { padding: 12px 24px; border: none; border-radius: 8px;
+    font-family: inherit; font-size: 15px; font-weight: bold;
+    cursor: pointer; transition: transform .15s, box-shadow .15s;
+    display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.2); }
+  .btn-primary { background: linear-gradient(135deg, #1e3c72, #2a5298); color: #fff; }
+  .btn-success { background: #27ae60; color: #fff; }
+  .btn-warning { background: #f39c12; color: #fff; }
+  .btn-danger  { background: #c0392b; color: #fff; }
+  .btn-info    { background: #2980b9; color: #fff; }
+  .btn-block { width: 100%; justify-content: center; }
+  .btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+  .exam-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media(max-width:600px) { .exam-grid { grid-template-columns: 1fr; } }
+  .exam-card { background: #f8f9fa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 18px; text-align: center; cursor: pointer; transition: all .2s; }
+  .exam-card:hover { border-color: #2a5298; transform: translateY(-2px); }
+  .exam-card.done { background: #d4edda; border-color: #27ae60; cursor: not-allowed; }
+  .exam-card h3 { font-size: 15px; color: #1e3c72; margin-bottom: 6px; }
+  .exam-card .status { font-size: 13px; color: #666; }
+  .exam-card .score { font-size: 22px; font-weight: bold; color: #27ae60; margin-top: 4px; }
+  .question { margin-bottom: 16px; padding: 14px; background: #f8f9fa;
+    border-radius: 10px; border-right: 4px solid #2a5298; }
+  .question .q-text { font-weight: bold; margin-bottom: 10px; font-size: 14px; line-height: 1.9; }
+  .option { display: flex; align-items: center; padding: 10px 12px; margin: 5px 0;
+    background: #fff; border: 2px solid #e0e0e0; border-radius: 8px;
+    cursor: pointer; transition: all .15s; font-size: 14px; line-height: 1.9; }
+  .option:hover { border-color: #2a5298; background: #f0f5ff; }
+  .option input { margin-left: 10px; }
+  .option.selected { background: #d4edda; border-color: #27ae60; }
+  .timer { position: sticky; top: 10px; background: #1e3c72; color: #fff;
+    padding: 10px 20px; border-radius: 10px; text-align: center;
+    font-size: 18px; font-weight: bold; margin-bottom: 14px; z-index: 100; }
+  .timer.warning { background: #c0392b; animation: pulse 1s infinite; }
+  @keyframes pulse { 50% { opacity: .7; } }
+  .progress-bar { height: 8px; background: #e0e0e0; border-radius: 4px;
+    overflow: hidden; margin-bottom: 16px; }
+  .progress-bar > div { height: 100%; background: linear-gradient(90deg, #27ae60, #2ecc71);
+    transition: width .3s; }
+  .report { background: #fff; padding: 30px; }
+  .report-header { text-align: center; border-bottom: 3px double #1e3c72;
+    padding-bottom: 14px; margin-bottom: 20px; }
+  .report-header .basmala { font-size: 13px; color: #555; }
+  .report-header h1 { color: #1e3c72; font-size: 22px; margin: 4px 0; }
+  .report-header h2 { color: #555; font-size: 15px; font-weight: normal; margin-top: 4px; }
+  .report-header h3 { color: #2a5298; font-size: 17px; margin-top: 8px; }
+  .student-info { display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    margin-bottom: 20px; padding: 14px; background: #f8f9fa; border-radius: 10px; }
+  .student-info div { font-size: 14px; }
+  .student-info b { color: #1e3c72; }
+  .report-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+  .report-table th, .report-table td { border: 1px solid #ddd; padding: 10px;
+    text-align: center; font-size: 14px; }
+  .report-table th { background: #1e3c72; color: #fff; }
+  .report-table tr:nth-child(even) { background: #f8f9fa; }
+  .report-table .total { background: #fff3cd; font-weight: bold; }
+  .report-footer { text-align: center; margin-top: 24px; padding-top: 16px;
+    border-top: 1px solid #ddd; font-size: 13px; color: #666; line-height: 2; }
+  .notice { padding: 14px; border-radius: 8px; margin-bottom: 14px; font-size: 14px; line-height: 1.8; }
+  .notice-info { background: #d1ecf1; color: #0c5460; border-right: 4px solid #17a2b8; }
+  .notice-success { background: #d4edda; color: #155724; border-right: 4px solid #27ae60; }
+  .notice-warning { background: #fff3cd; color: #856404; border-right: 4px solid #f39c12; }
+  .notice-danger { background: #f8d7da; color: #721c24; border-right: 4px solid #c0392b; }
+  .status-bar { position: fixed; bottom: 10px; left: 10px; padding: 8px 16px;
+    border-radius: 20px; font-size: 12px; font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0,0,0,.15); z-index: 999; }
+  .status-online { background: #27ae60; color: #fff; }
+  .status-offline { background: #f39c12; color: #fff; }
+  .status-syncing { background: #2980b9; color: #fff; }
+  @page { size: A4 portrait; margin: 15mm; }
+  @media print {
+    body { background: #fff !important; padding: 0; margin: 0; }
+    .no-print, .status-bar { display: none !important; }
+    .card { box-shadow: none; margin: 0; padding: 0; }
+    .report { padding: 10mm; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container" id="app"></div>
+<div id="statusBar" class="status-bar status-online">🌐 متصل</div>
+
+<script>
+/* ==================== تنظیمات ==================== */
+const GRADE = "نهم";
+const YEAR = "۱۴۰۶-۱۴۰۵";
+const EXAM_DATE = "۱۴۰۵/۰۷/۱۸";
+const SCHOOL = "آموزشگاه شهید مفتح";
+
+/* ⚠️ URL Apps Script خود را اینجا جایگزین کنید: */
+const EXAM_ENDPOINT = "https://script.google.com/macros/s/AKfyc.../exec";
+
+/* ==================== توابع کمکی ==================== */
+const F = (n, d) => `<span class="frac"><span class="num">${n}</span><span class="den">${d}</span></span>`;
+const M = (s) => `<span class="formula">${s}</span>`;
+const C = (s) => `<div class="center-formula"><span class="formula">${s}</span></div>`;
+
+/* ==================== داده‌های آزمون‌ها ==================== */
+const EXAMS = [
+  /* ============ ۱. ریاضی هشتم ============ */
+  {
+    id: "math8", title: "ریاضی هشتم", duration: 15,
+    questions: [
+      { q: `حاصل عبارت زیر کدام است؟<br>${C("(−۳)² + ۲ × (−۵)")}`,
+        options: ["۱۹","۱","(−۱)","(−۱۹)"], correct: 2 },
+      { q: `اگر ${M("x² = ۴۹")} و ${M("x")} عددی منفی باشد، مقدار ${M("x")} کدام است؟`,
+        options: ["۷","۴۹","(−۴۹)","(−۷)"], correct: 3 },
+      { q: `مجموع زوایای داخلی یک هشت‌ضلعی چند درجه است؟`,
+        options: ["۱۰۸۰","۷۲۰","۹۰۰","۱۲۶۰"], correct: 0 },
+      { q: `در مثلثی دو زاویه ۵۰ و ۶۰ درجه‌اند. زاویه سوم چند درجه است؟`,
+        options: ["۶۰","۷۰","۸۰","۹۰"], correct: 1 },
+      { q: `حاصل ${M("√۸۱")} کدام است؟`,
+        options: ["۷","۸","۹","۱۱"], correct: 2 },
+      { q: `اگر ${M("۳x + (−۵) = ۱۰")} باشد، مقدار ${M("x")} کدام است؟`,
+        options: ["۳","۴","۱۵","۵"], correct: 3 },
+      { q: `کدام عدد گنگ است؟`,
+        options: [`${M("√۲")}`, `${M("√۹")}`, `۰٫۲۵`, `${F("۴","۵")}`], correct: 0 },
+      { q: `نقطه ${M("(−۲, ۳)")} در کدام ناحیه دستگاه مختصات قرار دارد؟`,
+        options: ["ناحیه اول","ناحیه دوم","ناحیه سوم","ناحیه چهارم"], correct: 1 },
+      { q: `حجم استوانه‌ای به شعاع ۳ و ارتفاع ۵ کدام است؟ (${M("π ≈ ۳")})`,
+        options: ["۳۰","۱۳۵","۹۰","۴۵"], correct: 1 },
+      { q: `در پرتاب یک تاس، احتمال آمدن عدد زوج کدام است؟`,
+        options: [F("۱","۲"), F("۱","۳"), F("۱","۶"), F("۲","۳")], correct: 0 }
+    ]
+  },
+
+  /* ============ ۲. انگلیسی هشتم ============ */
+  {
+    id: "eng8", title: "انگلیسی هشتم", duration: 15,
+    questions: [
+      { q: `She ______ TV now.`, options: ["watch","watches","is watching","watched"], correct: 2 },
+      { q: `Yesterday I ______ to the park.`, options: ["go","gone","going","went"], correct: 3 },
+      { q: `Ali is ______ than Reza.`, options: ["taller","tall","tallest","more tall"], correct: 0 },
+      { q: `This is the ______ book I have ever read.`, options: ["best","good","better","well"], correct: 0 },
+      { q: `I have lived here ______ 2010.`, options: ["for","since","from","at"], correct: 1 },
+      { q: `The opposite of "hot" is ______.`, options: ["warm","sunny","dry","cold"], correct: 3 },
+      { q: `What is the past form of "buy"?`, options: ["buyed","buys","bought","buying"], correct: 2 },
+      { q: `He is good ______ math.`, options: ["at","in","on","for"], correct: 0 },
+      { q: `We ______ to school every day.`, options: ["goes","go","going","gone"], correct: 1 },
+      { q: `She is the ______ student in the class.`, options: ["smart","smarter","more smart","smartest"], correct: 3 }
+    ]
+  },
+
+  /* ============ ۳. عربی هشتم ============ */
+  {
+    id: "arabic8", title: "عربی هشتم", duration: 15,
+    questions: [
+      { q: `«یَذهَبُ» چه زمانی است؟`, options: ["ماضی","مضارع","امر","نهی"], correct: 1 },
+      { q: `ترجمه «کَتَبَ الطالِبُ الدَرسَ» کدام است؟`,
+        options: ["دانش‌آموز درس را می‌نویسد","دانش‌آموز درس را می‌نوشت","دانش‌آموز درس را خواهد نوشت","دانش‌آموز درس را نوشت"], correct: 3 },
+      { q: `فعل امر «تَنظُرُ» کدام است؟`, options: ["نَظَرَ","اُنظُر","یَنظُر","ناظِر"], correct: 1 },
+      { q: `مفرد «مُعَلِّمونَ» کدام است؟`, options: ["مُعَلِّمَة","مُعَلِّمین","مُعَلِّم","مُعَلِّمات"], correct: 2 },
+      { q: `«اُولئِکَ» برای اشاره به چه چیزی است؟`, options: ["نزدیک","متوسط","نامعلوم","دور"], correct: 3 },
+      { q: `ترجمه «فِی المَدرَسَةِ کُتُبٌ کَثیرَةٌ» کدام است؟`,
+        options: ["در مدرسه کتاب‌های زیادی است","کتاب‌ها در مدرسه‌اند","در مدرسه کتاب نیست","مدرسه کتاب دارد"], correct: 0 },
+      { q: `جمع «کِتاب» کدام است؟`, options: ["کاتِب","مَکتَب","کُتُب","مَکتوب"], correct: 2 },
+      { q: `کدام فعل ماضی است؟`, options: ["کَتَبَ","یَکتُبُ","اُکتُب","کاتِب"], correct: 0 },
+      { q: `ضمیر «هُم» به چه معناست؟`,
+        options: ["آن‌ها (مؤنث)","شما","ما","آن‌ها (مذکر)"], correct: 3 },
+      { q: `ترجمه «العِلمُ نورٌ» کدام است؟`,
+        options: ["دانش تاریکی است","نور دانش است","دانش نور است","دانش چیست؟"], correct: 2 }
+    ]
+  },
+
+  /* ============ ۴. علوم تجربی هشتم ============ */
+  {
+    id: "oloom8", title: "علوم تجربی هشتم", duration: 15,
+    questions: [
+      { q: `کدام‌یک از موارد زیر یک مخلوط است؟`, options: ["آب مقطر","طلا","نمک","هوا"], correct: 3 },
+      { q: `کدام‌یک تغییر شیمیایی است؟`, options: ["ذوب یخ","خرد کردن کاغذ","زنگ زدن آهن","تبخیر آب"], correct: 2 },
+      { q: `در اتم، بار منفی متعلق به کدام ذره است؟`, options: ["الکترون","پروتون","نوترون","هسته"], correct: 0 },
+      { q: `کدام اندام بخشی از دستگاه عصبی مرکزی است؟`, options: ["قلب","کبد","مغز","کلیه"], correct: 2 },
+      { q: `واحد اندازه‌گیری فشار در SI کدام است؟`, options: ["نیوتن","پاسکال","ژول","وات"], correct: 1 },
+      { q: `سرعت صوت در کدام محیط بیشتر است؟`, options: ["هوا","آب","خلأ","فولاد"], correct: 3 },
+      { q: `کدام‌یک از موارد زیر هورمون ترشح می‌کند؟`, options: ["قلب","غده تیروئید","روده","مثانه"], correct: 1 },
+      { q: `بزرگ‌نمایی تصویر در چشم توسط کدام بخش انجام می‌شود؟`,
+        options: ["مردمک","شبکیه","عصب بینایی","عدسی"], correct: 3 },
+      { q: `کدام‌یک در تولید مثل جنسی نقش دارد؟`, options: ["پیوند","قلمه","سلول جنسی","جوانه"], correct: 2 },
+      { q: `در یک آهنربا، قطب‌های هم‌نام چگونه بر هم اثر می‌گذارند؟`,
+        options: ["دفع","جذب","بی‌اثر","نامعلوم"], correct: 0 }
+    ]
+  },
+
+  /* ============ ۵. فارسی و ادبیات هشتم (با اصلاح) ============ */
+  {
+    id: "farsi8", title: "فارسی و ادبیات هشتم", duration: 15,
+    questions: [
+      { q: `در جمله «او در خانه است»، «است» چه نوع کلمه‌ای است؟`,
+        options: ["اسم","فعل","صفت","قید"], correct: 1 },
+      { q: `در گروه اسمی «همین چهار دانش‌آموز کوشا» هسته کدام است؟`,
+        options: ["چهار","کوشا","دانش‌آموز","همین"], correct: 2 },
+      { q: `کدام جمله «گذرا» است؟`,
+        options: ["او دوید","او خوابید","او نشست","او کتاب را خواند"], correct: 3 },
+      { q: `در مصراع «دستش مثل برگ بید می‌لرزید»، کدام آرایه دیده می‌شود؟`,
+        options: ["کنایه","تشبیه","جناس","سجع"], correct: 1 },
+      { q: `معنی واژه «شوریده» کدام است؟`,
+        options: ["آشفته و پریشان","شاد","منظم","خوشحال"], correct: 0 },
+      { q: `متضاد «عزت» کدام است؟`,
+        options: ["بزرگی","احترام","خواری","افتخار"], correct: 2 },
+      { q: `در مصراع «تو نیکی می‌کن و در دجله انداز»، شاعر بر چه چیزی تأکید دارد؟`,
+        options: ["کمک نکردن به دیگران","اهمیت دجله","پاداش فوری","نیکی بدون انتظار پاداش"], correct: 3 },
+      { q: `کدام واژه «صفت» است؟`,
+        options: ["زیبا","خواندن","خانه","به‌سرعت"], correct: 0 },
+      { q: `جمله «او آمد و نشست» چند فعل دارد؟`,
+        options: ["یک","سه","دو","هیچ‌کدام"], correct: 2 },
+      { q: `معنی ضرب‌المثل «دیگ به دیگ می‌گوید رویت سیاه» چیست؟`,
+        options: ["همکاری","آشپزی","دوستی","دیدن عیب دیگران و ندیدن عیب خود"], correct: 3 }
+    ]
+  },
+
+  /* ============ ۶. مطالعات اجتماعی هشتم ============ */
+  {
+    id: "social8", title: "مطالعات اجتماعی هشتم", duration: 15,
+    questions: [
+      { q: `کدام‌یک از موارد زیر یک سازمان بین‌المللی است؟`,
+        options: ["شهرداری","سازمان ملل متحد","استانداری","مجلس"], correct: 1 },
+      { q: `بزرگ‌ترین اقیانوس جهان کدام است؟`, options: ["اطلس","هند","آرام","منجمد شمالی"], correct: 2 },
+      { q: `تعاون به چه معناست؟`, options: ["رقابت","مخالفت","تنهایی","همکاری"], correct: 3 },
+      { q: `کدام‌یک از موارد زیر از آسیب‌های اجتماعی است؟`,
+        options: ["اعتیاد","ورزش","مطالعه","همکاری"], correct: 0 },
+      { q: `پیامبر اسلام (ص) در کدام شهر به دنیا آمدند؟`,
+        options: ["مکه","مدینه","طائف","بیت‌المقدس"], correct: 0 },
+      { q: `بزرگ‌ترین قاره جهان کدام است؟`,
+        options: ["آفریقا","آمریکای شمالی","اروپا","آسیا"], correct: 3 },
+      { q: `کدام‌یک از موارد زیر یک حق شهروندی است؟`,
+        options: ["پرداخت مالیات","آموزش","رعایت قانون","احترام به دیگران"], correct: 1 },
+      { q: `حکومت صفویان در ایران چه ویژگی مهمی داشت؟`,
+        options: ["پایان دادن به اسلام","رسمی کردن مذهب تشیع","ورود مغول‌ها","ساخت تخت جمشید"], correct: 1 },
+      { q: `یونسکو وابسته به کدام سازمان است؟`,
+        options: ["ناتو","اوپک","سازمان ملل متحد","اتحادیه اروپا"], correct: 2 },
+      { q: `مهم‌ترین عامل آلودگی هوا در شهرهای بزرگ کدام است؟`,
+        options: ["بارش باران","وزش باد","درختان","دود خودروها و کارخانه‌ها"], correct: 3 }
+    ]
+  }
+];
+
+/* ==================== مدیریت وضعیت ==================== */
+const STATE_KEY = "online_exam_" + GRADE;
+const PENDING_KEY = "pending_exam_" + GRADE;
+const DEVICE_KEY = "device_id_" + GRADE;
+
+let state = {
+  student: { firstName: "", lastName: "", className: "" },
+  results: {}, currentExam: null, currentAnswers: [],
+  timerId: null, timeLeft: 0, submittedToServer: false
+};
+
+function getDeviceId() {
+  let id = localStorage.getItem(DEVICE_KEY);
+  if (!id) { id = "dev_" + Date.now() + "_" + Math.random().toString(36).substr(2,9);
+    localStorage.setItem(DEVICE_KEY, id); }
+  return id;
+}
+function saveState() { try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch(e){} }
+function loadState() {
+  try { const s = localStorage.getItem(STATE_KEY);
+    if (s) { const p = JSON.parse(s); if (p && p.student) state = Object.assign(state, p); } } catch(e){}
+}
+function resetAll() {
+  if (!confirm("آیا مطمئنید؟ همه پاسخ‌ها و نمرات پاک خواهد شد.")) return;
+  localStorage.removeItem(STATE_KEY); localStorage.removeItem(PENDING_KEY); location.reload();
+}
+function updateStatusBar() {
+  const bar = document.getElementById("statusBar");
+  if (navigator.onLine) { bar.className = "status-bar status-online";
+    bar.textContent = "🌐 متصل — ارسال خودکار فعال"; }
+  else { bar.className = "status-bar status-offline";
+    bar.textContent = "📴 آفلاین — پاسخ‌ها ذخیره می‌شوند"; }
+}
+window.addEventListener("online", () => { updateStatusBar(); flushPending(); });
+window.addEventListener("offline", updateStatusBar);
+
+async function checkDuplicate(fn, ln, cn) {
+  if (!navigator.onLine) return "unknown";
+  try {
+    const url = `${EXAM_ENDPOINT}?action=check&firstName=${encodeURIComponent(fn)}&lastName=${encodeURIComponent(ln)}&className=${encodeURIComponent(cn)}&grade=${encodeURIComponent(GRADE)}`;
+    const res = await fetch(url); const data = await res.json(); return data.status;
+  } catch(e) { return "unknown"; }
+}
+
+function renderWelcome() {
+  document.getElementById("app").innerHTML = `
+    <div class="card">
+      <div class="header">
+        <div class="basmala">بسمه تعالی</div>
+        <h1>${SCHOOL}</h1>
+        <h2>سال تحصیلی ${YEAR} | پایه تحصیلی: ${GRADE}</h2>
+        <h2>آزمون سنجش آغازین</h2>
+        <div class="meta">تاریخ آزمون: ${EXAM_DATE}</div>
+      </div>
+      <div class="notice notice-info">
+        <b>راهنما:</b> لطفاً مشخصات خود را وارد کنید. آزمون به‌صورت آفلاین و آنلاین کار می‌کند.
+        در پایان، کارنامه شما صادر و به‌طور خودکار برای مدرسه ارسال می‌شود.
+      </div>
+      <div class="form-group">
+        <label>نام:</label>
+        <input type="text" id="firstName" placeholder="نام خود را وارد کنید" value="${state.student.firstName}">
+      </div>
+      <div class="form-group">
+        <label>نام خانوادگی:</label>
+        <input type="text" id="lastName" placeholder="نام خانوادگی خود را وارد کنید" value="${state.student.lastName}">
+      </div>
+      <div class="form-group">
+        <label>کلاس:</label>
+        <input type="text" id="className" placeholder="مثال: ۹۰۱" value="${state.student.className}">
+      </div>
+      <button class="btn btn-primary btn-block" id="startBtn" onclick="startExam()">ورود به آزمون ←</button>
+    </div>
+  `;
+}
+
+async function startExam() {
+  const fn = document.getElementById("firstName").value.trim();
+  const ln = document.getElementById("lastName").value.trim();
+  const cn = document.getElementById("className").value.trim();
+  if (!fn || !ln || !cn) { alert("لطفاً همه فیلدها را تکمیل کنید."); return; }
+  const btn = document.getElementById("startBtn");
+  btn.disabled = true; btn.textContent = "⏳ لطفاً صبر کنید...";
+  const check = await checkDuplicate(fn, ln, cn);
+  if (check === "duplicate") {
+    alert("شما قبلاً در این آزمون شرکت کرده‌اید.\nبرای پیگیری با مدرسه تماس بگیرید.");
+    btn.disabled = false; btn.textContent = "ورود به آزمون ←"; return;
+  }
+  state.student = { firstName: fn, lastName: ln, className: cn };
+  state.submittedToServer = false;
+  saveState(); renderDashboard();
+}
+
+function renderDashboard() {
+  const doneCount = Object.keys(state.results).length;
+  const allDone = doneCount === EXAMS.length;
+  const locked = state.submittedToServer;
+  const cardsHtml = EXAMS.map(ex => {
+    const r = state.results[ex.id];
+    let cls = "exam-card", status = "شروع آزمون", score = "";
+    if (r) { cls += " done"; status = "✓ تکمیل شده"; score = `<div class="score">${r.score} از ۱۰</div>`; }
+    return `<div class="${cls}" onclick="openExam('${ex.id}')">
+      <h3>${ex.title}</h3><div class="status">${status}</div>${score}</div>`;
+  }).join("");
+  document.getElementById("app").innerHTML = `
+    <div class="card">
+      <div class="header">
+        <div class="basmala">بسمه تعالی</div>
+        <h1>${SCHOOL}</h1>
+        <h2>سال تحصیلی ${YEAR} | پایه تحصیلی: ${GRADE}</h2>
+        <div class="meta">${state.student.firstName} ${state.student.lastName} — کلاس ${state.student.className}</div>
+      </div>
+      <div class="progress-bar"><div style="width:${(doneCount/EXAMS.length)*100}%"></div></div>
+      <div class="notice notice-info">تعداد آزمون‌های تکمیل‌شده: <b>${doneCount}</b> از <b>${EXAMS.length}</b></div>
+      <div class="exam-grid">${cardsHtml}</div>
+      <div class="btn-group">
+        ${allDone && !locked ? `<button class="btn btn-success btn-block" onclick="showReport()">📋 مشاهده کارنامه نهایی</button>` : ""}
+        ${locked ? `<button class="btn btn-info btn-block" onclick="showReport()">📋 مشاهده کارنامه</button>` : ""}
+        <button class="btn btn-warning" onclick="resetAll()">🔄 شروع مجدد</button>
+      </div>
+    </div>
+  `;
+}
+
+function openExam(id) {
+  if (state.submittedToServer) { alert("این آزمون قبلاً ارسال شده است."); return; }
+  const exam = EXAMS.find(e => e.id === id);
+  if (!exam) return;
+  if (state.results[id]) { alert("شما قبلاً به این آزمون پاسخ داده‌اید."); return; }
+  state.currentExam = id;
+  state.currentAnswers = new Array(exam.questions.length).fill(-1);
+  state.timeLeft = exam.duration * 60;
+  renderExam(); startTimer();
+}
+
+function startTimer() {
+  clearInterval(state.timerId);
+  state.timerId = setInterval(() => {
+    state.timeLeft--;
+    const el = document.getElementById("timer");
+    if (el) {
+      const m = Math.floor(state.timeLeft/60), s = state.timeLeft % 60;
+      el.textContent = `⏱ ${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+      if (state.timeLeft <= 60) el.classList.add("warning");
+    }
+    if (state.timeLeft <= 0) {
+      clearInterval(state.timerId);
+      alert("زمان آزمون به پایان رسید. پاسخ‌ها خودکار ارسال می‌شوند.");
+      submitExam();
+    }
+  }, 1000);
+}
+
+function renderExam() {
+  const exam = EXAMS.find(e => e.id === state.currentExam);
+  const m = Math.floor(state.timeLeft/60), s = state.timeLeft % 60;
+  const letters = ["الف","ب","ج","د"];
+  const questionsHtml = exam.questions.map((q, i) => `
+    <div class="question">
+      <div class="q-text">${i+1}. ${q.q}</div>
+      ${q.options.map((opt, j) => `
+        <label class="option" id="opt_${i}_${j}">
+          <input type="radio" name="q_${i}" value="${j}" onchange="selectAnswer(${i}, ${j})"
+            ${state.currentAnswers[i] === j ? "checked" : ""}>
+          <span>${letters[j]}) ${opt}</span>
+        </label>
+      `).join("")}
+    </div>
+  `).join("");
+  document.getElementById("app").innerHTML = `
+    <div class="card">
+      <div class="timer" id="timer">⏱ ${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}</div>
+      <div class="header">
+        <div class="basmala">بسمه تعالی</div>
+        <h1>${SCHOOL}</h1>
+        <h2>سال تحصیلی ${YEAR} | پایه تحصیلی: ${GRADE}</h2>
+        <h2 style="font-weight:bold; color:#1e3c72;">آزمون ${exam.title}</h2>
+        <div class="meta">${state.student.firstName} ${state.student.lastName} — کلاس ${state.student.className}</div>
+      </div>
+      ${questionsHtml}
+      <div class="btn-group">
+        <button class="btn btn-success btn-block" onclick="submitExam()">✅ ارسال پاسخ‌ها</button>
+        <button class="btn btn-danger" onclick="cancelExam()">انصراف</button>
+      </div>
+    </div>
+  `;
+  state.currentAnswers.forEach((v, i) => { if (v >= 0) selectAnswer(i, v); });
+  window.scrollTo(0,0);
+}
+
+function selectAnswer(qIdx, oIdx) {
+  state.currentAnswers[qIdx] = oIdx;
+  const exam = EXAMS.find(e => e.id === state.currentExam);
+  exam.questions[qIdx].options.forEach((_, j) => {
+    const el = document.getElementById(`opt_${qIdx}_${j}`);
+    if (el) el.classList.toggle("selected", j === oIdx);
+  });
+}
+
+function cancelExam() {
+  if (!confirm("آیا مطمئنید؟ پاسخ‌های این آزمون ذخیره نمی‌شود.")) return;
+  clearInterval(state.timerId);
+  state.currentExam = null; renderDashboard();
+}
+
+function submitExam() {
+  clearInterval(state.timerId);
+  const exam = EXAMS.find(e => e.id === state.currentExam);
+  let score = 0;
+  exam.questions.forEach((q, i) => { if (state.currentAnswers[i] === q.correct) score++; });
+  const elapsed = exam.duration*60 - state.timeLeft;
+  const mins = Math.floor(elapsed/60), secs = elapsed % 60;
+  state.results[exam.id] = {
+    answers: [...state.currentAnswers], score: score,
+    maxScore: exam.questions.length,
+    time: `${mins}:${String(secs).padStart(2,"0")}`,
+    examTitle: exam.title
+  };
+  saveState();
+  const pct = (score/exam.questions.length)*100;
+  const color = pct >= 80 ? "#27ae60" : pct >= 50 ? "#f39c12" : "#c0392b";
+  const message = pct >= 80 ? "آفرین! عملکرد عالی 🌟" :
+                  pct >= 50 ? "خوب بود، اما جای پیشرفت دارید 👍" :
+                  "نیاز به تمرین بیشتر دارید 💪";
+  document.getElementById("app").innerHTML = `
+    <div class="card">
+      <div class="header"><h1>نتیجه آزمون</h1><h2>${exam.title}</h2></div>
+      <div style="text-align:center; padding:30px;">
+        <div style="font-size:64px; font-weight:bold; color:${color};">${score}</div>
+        <div style="font-size:20px; color:#555;">از ${exam.questions.length}</div>
+        <div style="margin-top:16px; padding:12px; background:#f8f9fa; border-radius:10px;">${message}</div>
+        <div style="margin-top:14px; font-size:14px; color:#666;">زمان صرف‌شده: ${state.results[exam.id].time}</div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary btn-block" onclick="backToDashboard()">بازگشت به فهرست آزمون‌ها</button>
+      </div>
+    </div>
+  `;
+  window.scrollTo(0,0);
+}
+
+function backToDashboard() { state.currentExam = null; renderDashboard(); }
+
+function showReport() {
+  const totalScore = EXAMS.reduce((sum, ex) => sum + (state.results[ex.id]?.score || 0), 0);
+  const maxScore = EXAMS.length * 10;
+  const avg = (totalScore / maxScore * 20).toFixed(2);
+  const pct = (totalScore / maxScore * 100).toFixed(1);
+  const rows = EXAMS.map(ex => {
+    const r = state.results[ex.id] || { score: 0, time: "-" };
+    const score20 = (r.score / 10 * 20).toFixed(2);
+    return `<tr><td>${ex.title}</td><td>${r.score} از ۱۰</td><td>${score20} از ۲۰</td><td>${r.time}</td></tr>`;
+  }).join("");
+  const status = pct >= 80 ? "عالی" : pct >= 50 ? "قبول" : "نیاز به تلاش بیشتر";
+  const statusColor = pct >= 80 ? "#27ae60" : pct >= 50 ? "#f39c12" : "#c0392b";
+  document.getElementById("app").innerHTML = `
+    <div class="card report" id="reportCard">
+      <div class="report-header">
+        <div class="basmala">بسمه تعالی</div>
+        <h1>${SCHOOL}</h1>
+        <h2>سال تحصیلی ${YEAR} | پایه تحصیلی: ${GRADE}</h2>
+        <h3>کارنامه آزمون سنجش آغازین</h3>
+        <div style="margin-top:6px; font-size:13px; color:#555;">تاریخ آزمون: ${EXAM_DATE}</div>
+      </div>
+      <div class="student-info">
+        <div><b>نام و نام خانوادگی:</b> ${state.student.firstName} ${state.student.lastName}</div>
+        <div><b>کلاس:</b> ${state.student.className}</div>
+        <div><b>تعداد آزمون‌ها:</b> ${EXAMS.length} درس</div>
+        <div><b>تاریخ صدور:</b> ${new Date().toLocaleDateString("fa-IR")}</div>
+      </div>
+      <table class="report-table">
+        <thead><tr><th>درس</th><th>نمره از ۱۰</th><th>نمره از ۲۰</th><th>زمان</th></tr></thead>
+        <tbody>${rows}
+          <tr class="total"><td>مجموع</td><td>${totalScore} از ${maxScore}</td><td>${avg} از ۲۰</td><td>—</td></tr>
+        </tbody>
+      </table>
+      <div class="notice" style="background:#f8f9fa; border-right:4px solid ${statusColor}; text-align:center; font-size:15px;">
+        <b>معدل کل:</b> ${avg} از ۲۰ | <b>درصد:</b> ${pct}٪ | <b>وضعیت:</b> <span style="color:${statusColor}; font-weight:bold;">${status}</span>
+      </div>
+      <div class="report-footer">
+        این کارنامه به‌صورت خودکار صادر شده است.<br>
+        امضاء و مهر آموزشگاه: ......................................
+      </div>
+    </div>
+    <div class="card no-print">
+      ${!state.submittedToServer ? `<div class="notice notice-warning">
+        <b>⚠️ توجه:</b> برای ثبت نهایی نمره در سامانه مدرسه، روی دکمه «ارسال به مدرسه» کلیک کنید.
+      </div>` : `<div class="notice notice-success">
+        <b>✓ ارسال شد:</b> کارنامه شما به مدرسه ارسال و ثبت شد.
+      </div>`}
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="printReport()">🖨 چاپ / ذخیره PDF</button>
+        <button class="btn btn-info" onclick="downloadReportHTML()">💾 دانلود فایل کارنامه</button>
+        ${!state.submittedToServer ? `<button class="btn btn-success" onclick="sendToSchool()">📤 ارسال به مدرسه</button>` : ""}
+        <button class="btn btn-warning" onclick="copyReport()">📋 کپی متن</button>
+        <button class="btn btn-danger" onclick="backToDashboard()">← بازگشت</button>
+      </div>
+    </div>
+  `;
+  window.scrollTo(0,0);
+}
+
+function printReport() { window.print(); }
+
+function downloadReportHTML() {
+  const html = document.getElementById("reportCard").outerHTML;
+  const css = `<style>body{font-family:"Vazirmatn","B Nazanin",Tahoma,sans-serif;direction:rtl;text-align:right;padding:20px;background:#fff}.report{max-width:800px;margin:0 auto;padding:30px;background:#fff}.report-header{text-align:center;border-bottom:3px double #1e3c72;padding-bottom:14px;margin-bottom:20px}.report-header h1{color:#1e3c72;font-size:22px;margin:4px 0}.report-header h2{color:#555;font-size:15px;font-weight:normal}.report-header h3{color:#2a5298;font-size:17px;margin-top:8px}.student-info{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;padding:14px;background:#f8f9fa;border-radius:10px}.student-info div{font-size:14px}.student-info b{color:#1e3c72}.report-table{width:100%;border-collapse:collapse;margin-bottom:20px}.report-table th,.report-table td{border:1px solid #ddd;padding:10px;text-align:center;font-size:14px}.report-table th{background:#1e3c72;color:#fff}.report-table .total{background:#fff3cd;font-weight:bold}.notice{padding:14px;border-radius:8px;margin-bottom:14px;font-size:14px}.report-footer{text-align:center;margin-top:24px;padding-top:16px;border-top:1px solid #ddd;font-size:13px;color:#666}</style>`;
+  const fullHtml = `<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="UTF-8"><title>کارنامه ${state.student.firstName} ${state.student.lastName}</title>${css}</head><body>${html}</body></html>`;
+  const blob = new Blob([fullHtml], { type: "text/html;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `کارنامه_${state.student.firstName}_${state.student.lastName}_پایه${GRADE}.html`;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  alert("✓ فایل کارنامه دانلود شد.");
+}
+
+function copyReport() {
+  const lines = [`📋 کارنامه — ${SCHOOL}`, `پایه: ${GRADE} | ${YEAR}`,
+    `👤 ${state.student.firstName} ${state.student.lastName} — کلاس ${state.student.className}`, ""];
+  let total = 0;
+  EXAMS.forEach(ex => { const s = state.results[ex.id]?.score || 0; total += s;
+    lines.push(`• ${ex.title}: ${s}/۱۰`); });
+  const avg = (total/(EXAMS.length*10)*20).toFixed(2);
+  lines.push("", `📊 معدل: ${avg} از ۲۰`);
+  navigator.clipboard.writeText(lines.join("\n"))
+    .then(() => alert("✓ متن کپی شد."))
+    .catch(() => prompt("متن:", lines.join("\n")));
+}
+
+function buildPayload() {
+  const totalScore = EXAMS.reduce((sum, ex) => sum + (state.results[ex.id]?.score || 0), 0);
+  const maxScore = EXAMS.length * 10;
+  const avg = (totalScore / maxScore * 20).toFixed(2);
+  const pct = (totalScore / maxScore * 100);
+  const status = pct >= 80 ? "عالی" : pct >= 50 ? "قبول" : "نیاز به تلاش بیشتر";
+  return {
+    firstName: state.student.firstName, lastName: state.student.lastName,
+    className: state.student.className, grade: GRADE,
+    deviceId: getDeviceId(), timestamp: new Date().toISOString(),
+    results: EXAMS.map(ex => {
+      const r = state.results[ex.id] || { score: 0, time: "-", answers: [] };
+      return { examId: ex.id, examTitle: ex.title, score: r.score,
+        maxScore: 10, time: r.time, answers: r.answers };
+    }),
+    totalScore: totalScore, average: avg, status: status
+  };
+}
+
+async function sendToSchool() {
+  if (state.submittedToServer) { alert("قبلاً ارسال شده است."); return; }
+  const payload = buildPayload();
+  if (!navigator.onLine) {
+    localStorage.setItem(PENDING_KEY, JSON.stringify(payload));
+    alert("📴 شما آفلاین هستید.\nاطلاعات ذخیره شد و به‌طور خودکار ارسال می‌شود."); return;
+  }
+  await doSend(payload);
+}
+
+async function doSend(payload) {
+  const bar = document.getElementById("statusBar");
+  bar.className = "status-bar status-syncing";
+  bar.textContent = "⏳ در حال ارسال...";
+  try {
+    await fetch(EXAM_ENDPOINT, { method: "POST", mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload) });
+    state.submittedToServer = true; saveState();
+    localStorage.removeItem(PENDING_KEY);
+    updateStatusBar();
+    alert("✅ کارنامه با موفقیت به مدرسه ارسال شد.");
+    showReport();
+  } catch(e) {
+    localStorage.setItem(PENDING_KEY, JSON.stringify(payload));
+    updateStatusBar();
+    alert("⚠️ ارسال ناموفق بود. اطلاعات ذخیره شد.");
+  }
+}
+
+async function flushPending() {
+  const pending = localStorage.getItem(PENDING_KEY);
+  if (!pending) return;
+  try { await doSend(JSON.parse(pending)); } catch(e) {}
+}
+setInterval(() => { if (navigator.onLine) flushPending(); }, 30000);
+
+/* ==================== شروع ==================== */
+loadState(); updateStatusBar(); flushPending();
+if (state.student && state.student.firstName) renderDashboard();
+else renderWelcome();
+</script>
+</body>
+</html>
